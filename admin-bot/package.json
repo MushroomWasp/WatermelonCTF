@@ -1,0 +1,22 @@
+{
+  "name": "shellrace-admin-bot",
+  "version": "1.0.0",
+  "description": "Headless browser bot for the ShellRace CTF challenge that simulates admin activity to trigger XSS and CSRF vulnerabilities",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "cron": "echo '* * * * * cd $(pwd) && npm start >> admin-bot.log 2>&1' | crontab -"
+  },
+  "dependencies": {
+    "puppeteer": "^24.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
