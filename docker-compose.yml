@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  # Web server for the ShellRace CTF challenge
+  web:
+    image: php:8.0-apache
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html/
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+      - FLAG=flag{sh3ll_r4c3_c0nd1t10n_pwn3d_2024}
+    restart: always
+    networks:
+      - shellrace-network
+    command: >
+      bash -c "
+        chmod 777 /var/www/html/uploads &&
+        echo 'ServerName localhost' >> /etc/apache2/apache2.conf &&
+        echo $$FLAG > /flag_0xf8a2b3c4.txt &&
+        chmod 644 /flag_0xf8a2b3c4.txt &&
+        apache2-foreground
+      "
+
+  # Admin bot that visits the website
+  admin-bot:
+    build:
+      context: ./admin-bot
+      dockerfile: Dockerfile
+    volumes:
+      - ./admin-bot/logs:/usr/src/app/logs
+    depends_on:
+      - web
+    environment:
+      - NODE_ENV=production
+    networks:
+      - shellrace-network
+    restart: always
+    # Override the config to point to the web service
+    command: >
+      bash -c "
+        sed -i 's|baseUrl: \"http://localhost\"|baseUrl: \"http://web\"|g' src/config.js &&
+        cron && tail -f /var/log/cron.log
+      "
+
+networks:
+  shellrace-network:
+    driver: bridge
+
+volumes:
+  uploads:
+    driver: local 

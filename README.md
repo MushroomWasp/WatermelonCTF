@@ -7,14 +7,28 @@ This is a vulnerable PHP application designed for Capture The Flag (CTF) competi
 3. Race Condition
 4. RCE (Remote Code Execution)
 
-## Setup Instructions
+## Quick Deployment with Docker
 
-1. Deploy this application on a PHP-enabled web server (e.g., Apache with PHP).
-2. Make sure the `uploads` directory is writable by the web server.
-3. Run the admin bot periodically (e.g., via a cron job):
-   ```
-   */1 * * * * php /path/to/admin_bot.php
-   ```
+The simplest way to deploy this challenge is using Docker:
+
+```bash
+./docker-setup.sh
+```
+
+or manually:
+
+```bash
+# Create required directories
+mkdir -p uploads admin-bot/logs
+chmod 777 uploads admin-bot/logs
+
+# Launch with Docker Compose
+docker-compose up -d
+```
+
+This will:
+1. Start a PHP web server containing the vulnerable application
+2. Launch the admin bot that periodically visits the pages
 
 ## Login Credentials
 
@@ -79,11 +93,20 @@ http://localhost/uploads/shell.php?cmd=id
 
 The session cookie is set with the HTTP-only flag, preventing JavaScript from accessing it directly. However, the CSRF attack leverages the admin's active session, bypassing this protection.
 
-## Flag Location
+## Docker Management
 
-For CTF purposes, place a flag file at a non-guessable location, for example:
+To check logs for troubleshooting:
+```bash
+# Web server logs
+docker-compose logs web
+
+# Admin bot logs
+docker-compose logs admin-bot
 ```
-/flag_0xf8a2b3c4.txt
+
+To stop the challenge:
+```bash
+docker-compose down
 ```
 
 ## Legal Disclaimer
