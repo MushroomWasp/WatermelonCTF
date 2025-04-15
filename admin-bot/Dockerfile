@@ -57,13 +57,23 @@ RUN mkdir -p logs
 RUN touch /var/log/cron.log
 RUN chmod 777 /var/log/cron.log
 
+# Find where node is installed and create symlink if needed
+RUN which node && \
+    echo "Node is at: $(which node)" && \
+    if [ ! -f "/usr/local/bin/node" ]; then \
+      ln -s $(which node) /usr/local/bin/node; \
+    fi
+
 # Add crontab file
 COPY admin-bot-cron /etc/cron.d/admin-bot-cron
 RUN chmod 0644 /etc/cron.d/admin-bot-cron
 RUN crontab /etc/cron.d/admin-bot-cron
 
+# Configure PATH for cron
+RUN echo "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" > /etc/environment
+
 # Test if Node.js is working
 RUN node --version
 
 # Default command to run
-CMD ["bash", "-c", "cron && node src/index.js && tail -f /var/log/cron.log"] 
+CMD ["bash", "-c", "service cron start && node src/index.js && tail -f /var/log/cron.log"] 
