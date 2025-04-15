@@ -16,10 +16,26 @@ services:
       - shellrace-network
     command: >
       bash -c "
+        # Create required directories with proper permissions
+        mkdir -p /var/www/html/uploads &&
         chmod 777 /var/www/html/uploads &&
+        
+        # Create and set permissions for comments.txt
+        touch /var/www/html/comments.txt &&
+        chmod 666 /var/www/html/comments.txt &&
+        chown www-data:www-data /var/www/html/comments.txt &&
+        
+        # Set correct permissions for the web directory
+        chown -R www-data:www-data /var/www/html &&
+        
+        # Server configuration
         echo 'ServerName localhost' >> /etc/apache2/apache2.conf &&
+        
+        # Create the flag
         echo $$FLAG > /flag_0xf8a2b3c4.txt &&
         chmod 644 /flag_0xf8a2b3c4.txt &&
+        
+        # Start Apache
         apache2-foreground
       "
 
