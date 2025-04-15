@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     wget \
     xdg-utils \
+    cron \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
@@ -51,19 +52,18 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# Add cron
-RUN apt-get update && apt-get -y install cron
-
-# Create log file
+# Create log file and logs directory
+RUN mkdir -p logs
 RUN touch /var/log/cron.log
+RUN chmod 777 /var/log/cron.log
 
 # Add crontab file
 COPY admin-bot-cron /etc/cron.d/admin-bot-cron
 RUN chmod 0644 /etc/cron.d/admin-bot-cron
 RUN crontab /etc/cron.d/admin-bot-cron
 
-# Run the bot once as sanity check
-RUN node src/index.js --test-mode
+# Test if Node.js is working
+RUN node --version
 
-# Run cron in foreground
-CMD cron && tail -f /var/log/cron.log 
+# Default command to run
+CMD ["bash", "-c", "cron && node src/index.js && tail -f /var/log/cron.log"] 

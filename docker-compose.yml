@@ -41,7 +41,11 @@ services:
     command: >
       bash -c "
         sed -i 's|baseUrl: \"http://localhost\"|baseUrl: \"http://web\"|g' src/config.js &&
-        cron && tail -f /var/log/cron.log
+        echo 'Starting admin bot in container...' &&
+        node -v &&
+        cron &&
+        node src/index.js &&
+        tail -f /var/log/cron.log
       "
 
 networks:
